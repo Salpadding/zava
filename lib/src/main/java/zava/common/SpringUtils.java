@@ -18,7 +18,7 @@ public class SpringUtils {
         Field[] field = clazz.getDeclaredFields();
 
         for (int i = 0; i < field.length; i++) {
-            if (field[i].getAnnotation(Inject.class) == null) continue;
+            if (!ReflectionUtils.matchAnnotation(field[i].getAnnotations(), ".*(Inject|Autowired)$")) continue;
             field[i].setAccessible(true);
             if (field[i].getType().isAssignableFrom(applicationContext.getClass())) {
                 field[i].set(o, applicationContext);
