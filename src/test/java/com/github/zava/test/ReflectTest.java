@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-
 import java.lang.reflect.Proxy;
 
 public class ReflectTest {
@@ -21,7 +20,7 @@ public class ReflectTest {
 
         @Override
         public String needProxy() {
-            return "before proxy" ;
+            return "before proxy";
         }
 
         @Override
@@ -42,7 +41,7 @@ public class ReflectTest {
     public void test1() {
         ToProxy toProxy = (ToProxy) Proxy.newProxyInstance(
             ReflectTest.class.getClassLoader(),
-            new Class[] {ToProxy.class},
+            new Class[]{ToProxy.class},
             new ExampleInvokeHandler()
         );
         System.out.println(toProxy.getClass().getName());

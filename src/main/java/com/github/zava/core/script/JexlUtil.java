@@ -7,6 +7,7 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+// 执行 jexl 表达式
 public class JexlUtil {
     public static final Map<String, JexlScript> CACHE = new ConcurrentSkipListMap<>();
     public static final JexlEngine ENGINE = new JexlBuilder()
