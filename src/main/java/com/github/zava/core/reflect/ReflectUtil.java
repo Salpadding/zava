@@ -24,11 +24,6 @@ public class ReflectUtil {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            try {
-                declareInterface.getMethod(method.getName(), method.getParameterTypes());
-            } catch (NoSuchMethodException ex) {
-                return method.invoke(proxyTarget, args);
-            }
             rateLimiter.acquire();
             return method.invoke(proxyTarget, args);
         }
