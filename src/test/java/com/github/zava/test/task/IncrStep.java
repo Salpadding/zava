@@ -3,7 +3,7 @@ package com.github.zava.test.task;
 import com.github.zava.core.task.AbstractStep;
 
 public class IncrStep extends AbstractStep<Integer, StepImpl> {
-    public Class getMetaType() {
+    public Class<Integer> getMetaType() {
         return Integer.class;
     }
 

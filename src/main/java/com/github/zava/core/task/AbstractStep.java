@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 
-public abstract class AbstractStep<T, S extends Step> {
+public abstract class AbstractStep<T, S extends Step<?, ?>> {
     public static final int MAX_WARN_COUNT = 3;
 
     protected Class<T> getMetaType() {
@@ -21,9 +21,9 @@ public abstract class AbstractStep<T, S extends Step> {
 
     @Getter
     public static class Next {
-        private final Step fork;
+        private final Step<?, ?> fork;
 
-        private Next(Step fork) {
+        private Next(Step<?, ?> fork) {
             this.fork = fork;
         }
 
@@ -75,13 +75,13 @@ public abstract class AbstractStep<T, S extends Step> {
     public int warnCount;
 
     @SneakyThrows
-    public static AbstractStep load(Step step) {
+    public static AbstractStep load(Step<?, ?> step) {
         return (AbstractStep) TYPE_CLASS_MAP.get((int) step.getType())
             .getConstructor()
             .newInstance();
     }
 
-    public Next next(Step callbackFrom) {
+    public Next next(S callbackFrom) {
         setup();
         return Next.DONE;
     }

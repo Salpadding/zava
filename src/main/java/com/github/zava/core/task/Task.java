@@ -50,7 +50,7 @@ public interface Task<M> {
     default void execute(Logger log, TaskListener listener) {
         if (!activate(listener)) return;
         this.touch();
-        Step current = null;
+        Step<?, ?> current = null;
 
         while (getStatus() == Status.running) {
             if (current == null || current.getId() != getFocus()) {
@@ -60,7 +60,7 @@ public interface Task<M> {
             AbstractStep step = AbstractStep.load(current);
             step.step = current;
 
-            Step callbackFrom = null;
+            Step<?, ?> callbackFrom = null;
 
             // 收到回调
             if (current.getStatus() == Status.waitCallback) {

@@ -2,7 +2,6 @@ package com.github.zava.core.task;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -11,23 +10,22 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-@Slf4j(topic = "task")
 @RequiredArgsConstructor
-public abstract class TaskRunner<T extends Task, S extends Step> {
+public abstract class TaskRunner<T extends Task<?>, S extends Step<?, ?>> {
     // 执行中的任务
-    public final Map<Long, Task> tasks = new ConcurrentSkipListMap<>();
+    public final Map<Long, Task<?>> tasks = new ConcurrentSkipListMap<>();
     // 执行任务的线程
     public final Map<Long, Thread> threads = new ConcurrentSkipListMap<>();
 
-    private final TaskListener listener;
-    private final Logger logger;
+    private final TaskListener<T, S> listener;
+    private final Logger log;
 
     // 把超时任务标记为暂停状态
     public abstract int tryPause();
 
     public abstract List<T> fetchPaused();
 
-    private TaskManger taskManger = new TaskManger(this);
+    private final TaskManger taskManger = new TaskManger(this);
 
 
     public void interrupt() {
@@ -36,7 +34,7 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
 
     @RequiredArgsConstructor
     public static class TaskManger implements Runnable {
-        private final TaskRunner runner;
+        private final TaskRunner<?, ?> runner;
 
         public volatile boolean running = true;
         public Thread thread;
@@ -64,7 +62,7 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
                 try {
                     LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(30));
                 } catch (Exception ex) {
-                    log.error("", ex);
+                    runner.log.error("", ex);
                 }
             }
         }
@@ -75,8 +73,8 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
 
         @SneakyThrows
         public void tryResume() {
-            List<? extends Task> tasks = runner.fetchPaused();
-            for (Task task : tasks) {
+            List<? extends Task<?>> tasks = runner.fetchPaused();
+            for (Task<?> task : tasks) {
                 runner.run(task);
             }
         }
@@ -90,20 +88,21 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
         template.setType(type);
         template.setStatus(Status.created);
         long taskId = template.insert();
+
         // 有向图根节点
         Step root = template.fork(type);
         root.setMeta(template.serializeMeta(stepMeta));
         root.insert();
         template.updateFocus(root.getId());
         run(template);
-        return template.getId();
+        return taskId;
     }
 
     // 执行新任务或者恢复未执行完成的任务
-    public void run(Task task) {
+    public void run(Task<?> task) {
         if (!taskManger.running) return;
         Thread runner = new Thread(() -> {
-            task.execute(logger, listener);
+            task.execute(log, listener);
             if (task.getStatus().isCompleted()) {
                 log.info("task {} completed", task.getId());
             }
@@ -117,7 +116,7 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
 
     @SneakyThrows
     public void killTask(long id) {
-        Task t = this.tasks.get(id);
+        Task<?> t = this.tasks.get(id);
         Thread runner = this.threads.get(id);
         if (t != null) {
             t.updateStatus(Status.error);
@@ -133,7 +132,7 @@ public abstract class TaskRunner<T extends Task, S extends Step> {
             log.info("挂起任务 {} 个", this.tasks.size());
 
         this.taskManger.stop();
-        for (Map.Entry<Long, Task> entry : this.tasks.entrySet()) {
+        for (Map.Entry<Long, Task<?>> entry : this.tasks.entrySet()) {
             entry.getValue().updateStatus(Status.pause);
             Thread runner = threads.get(entry.getKey());
             if (runner != null) {

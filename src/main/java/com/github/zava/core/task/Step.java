@@ -2,7 +2,7 @@ package com.github.zava.core.task;
 
 import lombok.SneakyThrows;
 
-public interface Step<T extends Task, M> {
+public interface Step<T extends Task<?>, M> {
     long getId();
 
     void setId(long id);
