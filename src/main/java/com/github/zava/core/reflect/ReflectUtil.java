@@ -13,11 +13,8 @@ public class ReflectUtil {
         private final RateLimiter rateLimiter;
         private final Object proxyTarget;
 
-        // 要限流的接口
-        private final Class declareInterface;
 
-        public RateLimitInvocationHandler(Class declareInterface, Object proxyTarget, int ops) {
-            this.declareInterface = declareInterface;
+        public RateLimitInvocationHandler(Object proxyTarget, int ops) {
             this.proxyTarget = proxyTarget;
             this.rateLimiter = RateLimiter.create(ops);
         }
@@ -38,7 +35,7 @@ public class ReflectUtil {
         return (T) Proxy.newProxyInstance(
             obj.getClass().getClassLoader(),
             new Class[]{methodInterface},
-            new RateLimitInvocationHandler(methodInterface, obj, ops)
+            new RateLimitInvocationHandler(obj, ops)
         );
     }
 }
