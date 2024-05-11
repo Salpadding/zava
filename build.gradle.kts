@@ -20,6 +20,7 @@ dependencies {
 
     implementation("org.apache.commons:commons-jexl3:3.3")
     implementation("net.bytebuddy:byte-buddy:1.14.15")
+    implementation("com.google.guava:guava:33.0.0-jre")
 
 
 
