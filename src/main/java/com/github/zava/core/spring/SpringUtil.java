@@ -3,6 +3,7 @@ package com.github.zava.core.spring;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
@@ -21,11 +22,13 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 
 @Component
+@Slf4j(topic = "bean")
 public class SpringUtil {
     private static ApplicationContext ctx;
     private static Environment env;
 
     public SpringUtil(ApplicationContext ctx, Environment env) {
+        log.info("create {}", this.getClass().getName());
         SpringUtil.ctx = ctx;
         SpringUtil.env = env;
     }
@@ -54,7 +57,8 @@ public class SpringUtil {
             try {
                 clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
             } catch (NoSuchMethodException ex) {
-                return null;
+                if (method.getName().equals("hashCode") && method.getParameterTypes().length == 0)
+                    return System.identityHashCode(instance);
             }
             return SpringUtil.getBean(method.getReturnType());
         }

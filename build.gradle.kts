@@ -28,14 +28,24 @@ dependencies {
 
     compileOnly("org.springframework:spring-core:6.1.6")
     compileOnly("org.springframework:spring-context:6.1.6")
+    compileOnly("org.mybatis:mybatis:3.5.16")
 
     testImplementation("org.springframework.boot:spring-boot:3.2.5")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.5")
+    compileOnly("org.springframework.boot:spring-boot-starter-data-jpa:3.2.5")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.5")
+
+
 
     compileOnly("org.slf4j:slf4j-api:2.0.13")
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
     implementation("com.fasterxml.jackson.core:jackson-core:2.17.0")
+
+    testImplementation("org.mybatis:mybatis:3.5.16")
+    testImplementation("com.h2database:h2:2.2.224")
+    compileOnly("org.mybatis.generator:mybatis-generator-core:1.4.2")
+    testImplementation("org.mybatis.generator:mybatis-generator-core:1.4.2")
 }
 
 

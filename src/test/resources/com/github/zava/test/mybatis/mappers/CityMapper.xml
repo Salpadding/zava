@@ -1,0 +1,19 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- attribute: namespace 必须是接口名 -->
+<mapper namespace="com.github.zava.test.mybatis.mappers.CityMapper">
+    <select id="findAll">
+        select * from city
+        WHERE 1 = 1
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+    </select>
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="id">
+        insert into city(name, created_at, country_id)
+        values(#{name}, current_timestamp(), #{countryId})
+    </insert>
+</mapper>

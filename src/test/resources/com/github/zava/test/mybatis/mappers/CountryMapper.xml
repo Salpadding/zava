@@ -1,0 +1,43 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- attribute: namespace 必须是接口名 -->
+<mapper namespace="com.github.zava.test.mybatis.mappers.CountryMapper">
+    <!-- id 必须是接口的方法名称 -->
+    <!-- useGeneratedKeys=true keyProperty insert 语句要使用 读取生成主键 -->
+    <select id="findAll" resultMap="findAllMapper">
+        <!-- parameterType 可选 可以从接口推断 -->
+        select
+        co.id as co_id,
+        co.name as co_name,
+        co.created_at as co_created_at,
+        ci.id as ci_id,
+        ci.name as ci_name,
+        ci.created_at as ci_created_at,
+        ci.country_id as ci_country_id
+        from country co left join city ci on co.id = ci.country_id
+        where 1 = 1
+        <if test="name != null and name != ''">
+            and co.name = #{name}
+        </if>
+    </select>
+
+
+    <insert id="create" useGeneratedKeys="true" keyProperty="id">
+        insert into country(name, created_at)
+        values (#{name}, current_timestamp())
+    </insert>
+
+    <resultMap id="findAllMapper" type="com.github.zava.test.mybatis.Country" autoMapping="false">
+        <id property="id" column="co_id"/>
+        <result property="name" column="co_name"/>
+        <result property="createdAt" column="co_created_at" />
+        <collection property="cities" ofType="com.github.zava.test.mybatis.City">
+            <id  property="id" column="ci_id" />
+            <result property="name" column="ci_name"/>
+            <result property="createdAt" column="ci_created_at"/>
+            <result property="countryId" column="ci_country_id"/>
+        </collection>
+    </resultMap>
+</mapper>

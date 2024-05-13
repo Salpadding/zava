@@ -15,7 +15,10 @@ public interface Task<M> {
     M serializeMeta(Object any);
 
     // 更新状态 原子操作
-    boolean swapStatus(Status prev, Status next);
+    default boolean swapStatus(Status prev, Status next) {
+        setStatus(next);
+        return true;
+    }
 
     // 更新状态 不需要原子操作
     default void updateStatus(Status next) {
@@ -23,12 +26,12 @@ public interface Task<M> {
     }
 
     // 从底层加载焦点 step
-    default Step fetchFocus() {
+    default Step<?, M> fetchFocus() {
         return fetchStep(getFocus());
     }
 
     // 从底层数据库读取 step
-    Step fetchStep(long id);
+    Step<?, M> fetchStep(long id);
 
     // 更新 focus
     default void updateFocus(long focus) {
@@ -36,7 +39,7 @@ public interface Task<M> {
     }
 
     // 标记断点 用于恢复任务
-    default void markBreakpoint(long breakpoint) {
+    default void updateBreakpoint(long breakpoint) {
         setBreakpoint(breakpoint);
     }
 
@@ -114,7 +117,7 @@ public interface Task<M> {
                 }
 
                 if (next == AbstractStep.Next.ERROR)
-                    markBreakpoint(current.getId());
+                    updateBreakpoint(current.getId());
 
                 if (next.getFork() != null) {
                     long newStepId = next.getFork().insert();
