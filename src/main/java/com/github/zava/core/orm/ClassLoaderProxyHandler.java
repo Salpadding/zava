@@ -73,27 +73,18 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
         // 确定是 mapper 了 进行魔改操作
         // 先读取文件
         InputStream inputStream = null;
-        if (locationPrefix.startsWith("classpath:")) {
-            try {
-                inputStream = delegate.getResourceAsStream(
-                    Paths.get(
-                        locationPrefix.replaceAll("^classpath:", ""),
-                        baseFileName
-                    ).toString()
-                );
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+        String filePath = Paths.get(locationPrefix, baseFileName).toString();
+        if (filePath.startsWith("classpath:")) {
+            inputStream = delegate.getResourceAsStream(
+                filePath.replaceAll("^classpath:", "")
+            );
         } else {
-            try {
-                inputStream = new FileInputStream(Paths.get(
-                    locationPrefix,
-                    baseFileName
-                ).getFileName().toFile());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            inputStream = new FileInputStream(filePath);
         }
+
+        if (inputStream == null)
+            throw new RuntimeException(filePath + " not found");
+
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
 
