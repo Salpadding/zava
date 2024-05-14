@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 public interface Task<M> {
-    Step<?, M> createDefault();
+    Step<?, ? extends M> createDefault();
 
     <T> T deserializeMeta(Object any, Class<? extends T> metaType);
 
@@ -26,12 +26,12 @@ public interface Task<M> {
     }
 
     // 从底层加载焦点 step
-    default Step<?, M> fetchFocus() {
+    default Step<?, ? extends M> fetchFocus() {
         return fetchStep(getFocus());
     }
 
     // 从底层数据库读取 step
-    Step<?, M> fetchStep(long id);
+    Step<?, ? extends M> fetchStep(long id);
 
     // 更新 focus
     default void updateFocus(long focus) {
