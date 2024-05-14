@@ -110,7 +110,7 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
         String xmlContent = os.toString(StandardCharsets.UTF_8);
 
         // 补充 mapper.namespace
-        String result = xmlContent.replaceAll("<mapper[\\s\\t]*>", "<mapper namespace=\"" + mapperInterfaceName + "\">");
+        String result = xmlContent.replaceAll("<mapper([\\s\\t]+namespace=\"[\\s\\t]*\")?[\\s\\t]*>", "<mapper namespace=\"" + mapperInterfaceName + "\">");
         return new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8));
     }
 }

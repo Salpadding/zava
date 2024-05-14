@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!-- attribute: namespace 必须是接口名 -->
-<mapper>
+<mapper namespace="" >
     <!-- id 必须是接口的方法名称 -->
     <!-- useGeneratedKeys=true keyProperty insert 语句要使用 读取生成主键 -->
     <select id="findAll" resultMap="findAllMapper">
