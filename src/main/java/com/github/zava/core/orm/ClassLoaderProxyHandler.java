@@ -1,11 +1,15 @@
 package com.github.zava.core.orm;
 
+import com.google.common.reflect.Reflection;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,13 +41,11 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
 
     @SneakyThrows
     private Object interceptInternal(Object obj, Method method, Object[] args, MethodProxy proxy) throws InvocationTargetException {
-        if (method.getName().equals("hashCode") && args.length == 0)
-            return System.identityHashCode(this);
-        if (method.getName().equals("equals") &&
-            method.getParameterTypes().length == 1 &&
-            method.getParameterTypes()[0] == Object.class)
-            return this.equals(args[0]);
+        // object 的方法 不需要代理
+        if(ReflectionUtils.isObjectMethod(method))
+            return method.invoke(this, args);
 
+        // 不需要代理的方法
         if (!method.getName().equals("getResourceAsStream") || method.getParameterTypes().length != 1 ||
             method.getParameterTypes()[0] != String.class
         ) {
@@ -62,9 +64,11 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
         try {
             mapperInterface = delegate.loadClass(mapperInterfaceName);
         } catch (ClassNotFoundException ex) {
+            // 不是 java class 不需要代理
             return method.invoke(delegate, args);
         }
 
+        // 查看是否是 mybatis mapper
         if (!mapperInterface.isAnnotationPresent(Mapper.class))
             return method.invoke(delegate, args);
 
@@ -85,23 +89,13 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
         if (inputStream == null)
             throw new RuntimeException(filePath + " not found");
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-
-        int n = 0;
-        while (true) {
-            n = inputStream.read(buf);
-            if (n <= 0)
-                break;
-            os.write(buf, 0, n);
-        }
-        inputStream.close();
-        os.close();
-
-        String xmlContent = os.toString(StandardCharsets.UTF_8);
+        String xmlContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
         // 补充 mapper.namespace
-        String result = xmlContent.replaceAll("<mapper([\\s\\t]+namespace=\"[\\s\\t]*\")?[\\s\\t]*>", "<mapper namespace=\"" + mapperInterfaceName + "\">");
-        return new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8));
+        String result = xmlContent.replaceAll(
+            "<mapper([\\s\\t]+namespace=\"[\\s\\t]*\")?[\\s\\t]*>",
+            "<mapper namespace=\"" + mapperInterfaceName + "\">"
+        );
+        return IOUtils.toInputStream(result, StandardCharsets.UTF_8);
     }
 }

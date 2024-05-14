@@ -46,6 +46,10 @@ dependencies {
     testImplementation("com.h2database:h2:2.2.224")
     compileOnly("org.mybatis.generator:mybatis-generator-core:1.4.2")
     testImplementation("org.mybatis.generator:mybatis-generator-core:1.4.2")
+
+    testImplementation("commons-io:commons-io:2.16.1")
+    compileOnly("commons-io:commons-io:2.16.1")
+
 }
 
 
