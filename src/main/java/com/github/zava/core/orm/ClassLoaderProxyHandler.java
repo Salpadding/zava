@@ -6,12 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
-import org.w3c.dom.Document;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -114,7 +109,8 @@ public class ClassLoaderProxyHandler implements MethodInterceptor {
 
         String xmlContent = os.toString(StandardCharsets.UTF_8);
 
-        String result = xmlContent.replace("<mapper>", "<mapper namespace=\"" + mapperInterfaceName + "\">");
+        // 补充 mapper.namespace
+        String result = xmlContent.replaceAll("<mapper[\\s\\t]*>", "<mapper namespace=\"" + mapperInterfaceName + "\">");
         return new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8));
     }
 }
