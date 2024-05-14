@@ -1,7 +1,6 @@
 package com.github.zava.test;
 
 import com.github.zava.core.spring.SpringUtil;
-import com.github.zava.test.mybatis.mappers.CityMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,13 +52,6 @@ public class SpringTest {
         Assertions.assertEquals(
             SpringUtil.getBean(BeanGetter.class).getTestBean().getName(),
             TestBean.class.getName()
-        );
-    }
-
-    @Test
-    public void test2() {
-        SpringUtil.getResource(
-            "classpath:" + CityMapper.class.getName().replaceAll("\\.", "/") + ".xml"
         );
     }
 }

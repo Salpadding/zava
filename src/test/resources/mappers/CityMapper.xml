@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!-- attribute: namespace 必须是接口名 -->
-<mapper namespace="com.github.zava.test.mybatis.mappers.CityMapper">
+<mapper>
     <select id="findAll">
         select * from city
         WHERE 1 = 1

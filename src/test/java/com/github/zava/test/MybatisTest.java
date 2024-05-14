@@ -54,9 +54,7 @@ public class MybatisTest {
 
         @Bean
         public SqlSessionFactory sqlSessionFactory(DataSource dataSource) {
-            SqlSessionFactory factory = MybatisUtil.createFactory("dev", dataSource);
-            factory.getConfiguration().addMappers(CountryMapper.class.getPackageName());
-            return factory;
+            return MybatisUtil.createFactory(CityMapper.class, "classpath:mappers", dataSource);
         }
 
         @Bean
