@@ -50,6 +50,11 @@ dependencies {
     testImplementation("commons-io:commons-io:2.16.1")
     compileOnly("commons-io:commons-io:2.16.1")
 
+    compileOnly("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("io.netty:netty-all:4.1.109.Final")
+    compileOnly("io.netty:netty-all:4.1.109.Final")
+
 }
 
 

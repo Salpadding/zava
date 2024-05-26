@@ -1,6 +1,6 @@
 package com.github.zava.test;
 
-import com.github.zava.core.reflect.ReflectUtils;
+import com.github.zava.core.reflect.ReflectUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;
@@ -51,6 +51,6 @@ public class ReflectTest {
 
     @Test
     public void test2() {
-        ToProxy toProxy = ReflectUtils.limitOps(ToProxy.class, new Example(), 100);
+        ToProxy toProxy = ReflectUtil.limitOps(ToProxy.class, new Example(), 100);
     }
 }
